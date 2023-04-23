@@ -1,0 +1,41 @@
+<.header>
+  Listing Medications
+  <:actions>
+    <.link patch={~p"/medications/new"}>
+      <.button>New Medication</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="medications"
+  rows={@streams.medications}
+  row_click={fn {_id, medication} -> JS.navigate(~p"/medications/#{medication}") end}
+>
+  <:col :let={{_id, medication}} label="Name"><%= medication.name %></:col>
+  <:action :let={{_id, medication}}>
+    <div class="sr-only">
+      <.link navigate={~p"/medications/#{medication}"}>Show</.link>
+    </div>
+    <.link patch={~p"/medications/#{medication}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, medication}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: medication.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="medication-modal" show on_cancel={JS.patch(~p"/medications")}>
+  <.live_component
+    module={MedtrackWeb.MedicationLive.FormComponent}
+    id={@medication.id || :new}
+    title={@page_title}
+    action={@live_action}
+    medication={@medication}
+    patch={~p"/medications"}
+  />
+</.modal>
