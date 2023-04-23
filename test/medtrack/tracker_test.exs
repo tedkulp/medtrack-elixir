@@ -112,4 +112,60 @@ defmodule Medtrack.TrackerTest do
       assert %Ecto.Changeset{} = Tracker.change_dose(dose)
     end
   end
+
+  describe "refills" do
+    alias Medtrack.Tracker.Refill
+
+    import Medtrack.TrackerFixtures
+
+    @invalid_attrs %{filled_at: nil, quantity: nil}
+
+    test "list_refills/0 returns all refills" do
+      refill = refill_fixture()
+      assert Tracker.list_refills() == [refill]
+    end
+
+    test "get_refill!/1 returns the refill with given id" do
+      refill = refill_fixture()
+      assert Tracker.get_refill!(refill.id) == refill
+    end
+
+    test "create_refill/1 with valid data creates a refill" do
+      valid_attrs = %{filled_at: ~N[2023-04-22 15:57:00], quantity: 42}
+
+      assert {:ok, %Refill{} = refill} = Tracker.create_refill(valid_attrs)
+      assert refill.filled_at == ~N[2023-04-22 15:57:00]
+      assert refill.quantity == 42
+    end
+
+    test "create_refill/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Tracker.create_refill(@invalid_attrs)
+    end
+
+    test "update_refill/2 with valid data updates the refill" do
+      refill = refill_fixture()
+      update_attrs = %{filled_at: ~N[2023-04-23 15:57:00], quantity: 43}
+
+      assert {:ok, %Refill{} = refill} = Tracker.update_refill(refill, update_attrs)
+      assert refill.filled_at == ~N[2023-04-23 15:57:00]
+      assert refill.quantity == 43
+    end
+
+    test "update_refill/2 with invalid data returns error changeset" do
+      refill = refill_fixture()
+      assert {:error, %Ecto.Changeset{}} = Tracker.update_refill(refill, @invalid_attrs)
+      assert refill == Tracker.get_refill!(refill.id)
+    end
+
+    test "delete_refill/1 deletes the refill" do
+      refill = refill_fixture()
+      assert {:ok, %Refill{}} = Tracker.delete_refill(refill)
+      assert_raise Ecto.NoResultsError, fn -> Tracker.get_refill!(refill.id) end
+    end
+
+    test "change_refill/1 returns a refill changeset" do
+      refill = refill_fixture()
+      assert %Ecto.Changeset{} = Tracker.change_refill(refill)
+    end
+  end
 end

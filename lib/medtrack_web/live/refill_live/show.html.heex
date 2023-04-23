@@ -1,0 +1,36 @@
+<.header>
+  Refill <%= @refill.id %>
+  <:subtitle>This is a refill record from your database.</:subtitle>
+  <:actions>
+    <.link
+      patch={~p"/medications/#{@medication}/refills/#{@refill}/show/edit"}
+      phx-click={JS.push_focus()}
+    >
+      <.button>Edit refill</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Filled at"><%= @refill.filled_at %></:item>
+  <:item title="Quantity"><%= @refill.quantity %></:item>
+</.list>
+
+<.back navigate={~p"/medications/#{@medication}/refills"}>Back to refills</.back>
+
+<.modal
+  :if={@live_action == :edit}
+  id="refill-modal"
+  show
+  on_cancel={JS.patch(~p"/medications/#{@medication}/refills/#{@refill}")}
+>
+  <.live_component
+    module={MedtrackWeb.RefillLive.FormComponent}
+    id={@refill.id}
+    title={@page_title}
+    action={@live_action}
+    refill={@refill}
+    medication={@medication}
+    patch={~p"/medications/#{@medication}/refills/#{@refill}"}
+  />
+</.modal>

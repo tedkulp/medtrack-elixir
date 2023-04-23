@@ -230,4 +230,115 @@ defmodule Medtrack.Tracker do
   def change_dose(%Dose{} = dose, attrs \\ %{}) do
     Dose.changeset(dose, attrs)
   end
+
+  alias Medtrack.Tracker.Refill
+
+  @doc """
+  Returns the list of refills.
+
+  ## Examples
+
+      iex> list_refills()
+      [%Refill{}, ...]
+
+  """
+  def list_refills(medication_id) do
+    from(Refill)
+    |> where([d], d.medication_id == ^medication_id)
+    |> preload(:medication)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single refill.
+
+  Raises `Ecto.NoResultsError` if the Refill does not exist.
+
+  ## Examples
+
+      iex> get_refill!(123)
+      %Refill{}
+
+      iex> get_refill!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_refill!(id), do: Repo.get!(Refill, id)
+
+  @doc """
+  Creates a refill.
+
+  ## Examples
+
+      iex> create_refill(%{field: value})
+      {:ok, %Refill{}}
+
+      iex> create_refill(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_refill(attrs \\ %{}, medication_id) do
+    attrs = Map.put(attrs, "medication_id", medication_id)
+
+    %Refill{}
+    |> Refill.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a refill.
+
+  ## Examples
+
+      iex> update_refill(refill, %{field: new_value})
+      {:ok, %Refill{}}
+
+      iex> update_refill(refill, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_refill(%Refill{} = refill, attrs, medication_id) do
+    existing_refill = get_refill!(refill.id)
+
+    if existing_refill.id == refill.id do
+      refill = Map.put(refill, "medication_id", medication_id)
+
+      refill
+      |> Refill.changeset(attrs)
+      |> Repo.update()
+    end
+  end
+
+  @doc """
+  Deletes a refill.
+
+  ## Examples
+
+      iex> delete_refill(refill)
+      {:ok, %Refill{}}
+
+      iex> delete_refill(refill)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_refill(%Refill{} = refill, medication_id) do
+    existing_refill = get_refill!(refill.id)
+
+    if to_string(existing_refill.medication_id) == to_string(medication_id) do
+      Repo.delete(refill)
+    end
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking refill changes.
+
+  ## Examples
+
+      iex> change_refill(refill)
+      %Ecto.Changeset{data: %Refill{}}
+
+  """
+  def change_refill(%Refill{} = refill, attrs \\ %{}) do
+    Refill.changeset(refill, attrs)
+  end
 end

@@ -1,4 +1,4 @@
-defmodule MedtrackWeb.DoseLive.FormComponent do
+defmodule MedtrackWeb.RefillLive.FormComponent do
   use MedtrackWeb, :live_component
 
   alias Medtrack.Tracker
@@ -9,21 +9,20 @@ defmodule MedtrackWeb.DoseLive.FormComponent do
     <div>
       <.header>
         <%= @title %>
-        <:subtitle>Use this form to manage dose records in your database.</:subtitle>
+        <:subtitle>Use this form to manage refill records in your database.</:subtitle>
       </.header>
 
       <.simple_form
         for={@form}
-        id="dose-form"
+        id="refill-form"
         phx-target={@myself}
         phx-change="validate"
         phx-submit="save"
-        phx-para
       >
-        <.input field={@form[:taken_at]} type="datetime-local" label="Taken at" />
+        <.input field={@form[:filled_at]} type="datetime-local" label="Filled at" />
         <.input field={@form[:quantity]} type="number" label="Quantity" />
         <:actions>
-          <.button phx-disable-with="Saving...">Save Dose</.button>
+          <.button phx-disable-with="Saving...">Save Refill</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -31,8 +30,8 @@ defmodule MedtrackWeb.DoseLive.FormComponent do
   end
 
   @impl true
-  def update(%{dose: dose} = assigns, socket) do
-    changeset = Tracker.change_dose(dose)
+  def update(%{refill: refill} = assigns, socket) do
+    changeset = Tracker.change_refill(refill)
 
     {:ok,
      socket
@@ -41,27 +40,27 @@ defmodule MedtrackWeb.DoseLive.FormComponent do
   end
 
   @impl true
-  def handle_event("validate", %{"dose" => dose_params}, socket) do
+  def handle_event("validate", %{"refill" => refill_params}, socket) do
     changeset =
-      socket.assigns.dose
-      |> Tracker.change_dose(dose_params)
+      socket.assigns.refill
+      |> Tracker.change_refill(refill_params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign_form(socket, changeset)}
   end
 
-  def handle_event("save", %{"dose" => dose_params}, socket) do
-    save_dose(socket, socket.assigns.action, dose_params)
+  def handle_event("save", %{"refill" => refill_params}, socket) do
+    save_refill(socket, socket.assigns.action, refill_params)
   end
 
-  defp save_dose(socket, :edit, dose_params) do
-    case Tracker.update_dose(socket.assigns.dose, dose_params, socket.assigns.medication_id) do
-      {:ok, dose} ->
-        notify_parent({:saved, dose})
+  defp save_refill(socket, :edit, refill_params) do
+    case Tracker.update_refill(socket.assigns.refill, refill_params, socket.assigns.medication_id) do
+      {:ok, refill} ->
+        notify_parent({:saved, refill})
 
         {:noreply,
          socket
-         |> put_flash(:info, "Dose updated successfully")
+         |> put_flash(:info, "Refill updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -69,14 +68,14 @@ defmodule MedtrackWeb.DoseLive.FormComponent do
     end
   end
 
-  defp save_dose(socket, :new, dose_params) do
-    case Tracker.create_dose(dose_params, socket.assigns.medication_id) do
-      {:ok, dose} ->
-        notify_parent({:saved, dose})
+  defp save_refill(socket, :new, refill_params) do
+    case Tracker.create_refill(refill_params, socket.assigns.medication_id) do
+      {:ok, refill} ->
+        notify_parent({:saved, refill})
 
         {:noreply,
          socket
-         |> put_flash(:info, "Dose created successfully")
+         |> put_flash(:info, "Refill created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->

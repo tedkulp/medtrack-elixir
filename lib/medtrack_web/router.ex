@@ -33,6 +33,13 @@ defmodule MedtrackWeb.Router do
 
     live "/medications/:medication_id/doses/:id", DoseLive.Show, :show
     live "/medications/:medication_id/doses/:id/show/edit", DoseLive.Show, :edit
+
+    live "/medications/:medication_id/refills", RefillLive.Index, :index
+    live "/medications/:medication_id/refills/new", RefillLive.Index, :new
+    live "/medications/:medication_id/refills/:id/edit", RefillLive.Index, :edit
+
+    live "/medications/:medication_id/refills/:id", RefillLive.Show, :show
+    live "/medications/:medication_id/refills/:id/show/edit", RefillLive.Show, :edit
   end
 
   scope "/", MedtrackWeb do

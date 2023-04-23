@@ -32,4 +32,19 @@ defmodule Medtrack.TrackerFixtures do
 
     dose
   end
+
+  @doc """
+  Generate a refill.
+  """
+  def refill_fixture(attrs \\ %{}) do
+    {:ok, refill} =
+      attrs
+      |> Enum.into(%{
+        filled_at: ~N[2023-04-22 15:57:00],
+        quantity: 42
+      })
+      |> Medtrack.Tracker.create_refill()
+
+    refill
+  end
 end

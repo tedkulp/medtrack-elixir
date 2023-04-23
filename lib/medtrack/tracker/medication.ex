@@ -7,6 +7,7 @@ defmodule Medtrack.Tracker.Medication do
     field :user_id, :id
 
     has_many :doses, Medtrack.Tracker.Dose
+    has_many :refills, Medtrack.Tracker.Refill
 
     timestamps()
   end
