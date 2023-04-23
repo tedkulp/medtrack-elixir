@@ -1,0 +1,48 @@
+<.header>
+  Listing Doses
+  <:actions>
+    <.link patch={~p"/medications/#{@medication_id}/doses/new"}>
+      <.button>New Dose</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="doses"
+  rows={@streams.doses}
+  row_click={fn {_id, dose} -> JS.navigate(~p"/medications/#{@medication_id}/doses/#{dose}") end}
+>
+  <:col :let={{_id, dose}} label="Taken at"><%= dose.taken_at %></:col>
+  <:col :let={{_id, dose}} label="Quantity"><%= dose.quantity %></:col>
+  <:action :let={{_id, dose}}>
+    <div class="sr-only">
+      <.link navigate={~p"/medications/#{@medication_id}/doses/#{dose}"}>Show</.link>
+    </div>
+    <.link patch={~p"/medications/#{@medication_id}/doses/#{dose}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, dose}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: dose.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="dose-modal"
+  show
+  on_cancel={JS.patch(~p"/medications/#{@medication_id}/doses")}
+>
+  <.live_component
+    module={MedtrackWeb.DoseLive.FormComponent}
+    id={@dose.id || :new}
+    medication_id={@medication_id}
+    title={@page_title}
+    action={@live_action}
+    dose={@dose}
+    patch={~p"/medications/#{@medication_id}/doses"}
+  />
+</.modal>

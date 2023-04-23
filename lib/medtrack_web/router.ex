@@ -18,6 +18,24 @@ defmodule MedtrackWeb.Router do
   end
 
   scope "/", MedtrackWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live "/medications", MedicationLive.Index, :index
+    live "/medications/new", MedicationLive.Index, :new
+    live "/medications/:id/edit", MedicationLive.Index, :edit
+
+    live "/medications/:id", MedicationLive.Show, :show
+    live "/medications/:id/show/edit", MedicationLive.Show, :edit
+
+    live "/medications/:medication_id/doses", DoseLive.Index, :index
+    live "/medications/:medication_id/doses/new", DoseLive.Index, :new
+    live "/medications/:medication_id/doses/:id/edit", DoseLive.Index, :edit
+
+    live "/medications/:medication_id/doses/:id", DoseLive.Show, :show
+    live "/medications/:medication_id/doses/:id/show/edit", DoseLive.Show, :edit
+  end
+
+  scope "/", MedtrackWeb do
     pipe_through :browser
 
     get "/", PageController, :home

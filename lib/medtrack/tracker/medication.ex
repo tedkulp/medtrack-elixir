@@ -6,13 +6,15 @@ defmodule Medtrack.Tracker.Medication do
     field :name, :string
     field :user_id, :id
 
+    has_many :doses, Medtrack.Tracker.Dose
+
     timestamps()
   end
 
   @doc false
   def changeset(medication, attrs) do
     medication
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :user_id])
+    |> validate_required([:name, :user_id])
   end
 end

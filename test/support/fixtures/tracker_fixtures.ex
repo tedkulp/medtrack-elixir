@@ -17,4 +17,19 @@ defmodule Medtrack.TrackerFixtures do
 
     medication
   end
+
+  @doc """
+  Generate a dose.
+  """
+  def dose_fixture(attrs \\ %{}) do
+    {:ok, dose} =
+      attrs
+      |> Enum.into(%{
+        quantity: 42,
+        taken_at: ~N[2023-04-22 13:12:00]
+      })
+      |> Medtrack.Tracker.create_dose()
+
+    dose
+  end
 end

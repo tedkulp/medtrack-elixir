@@ -1,0 +1,27 @@
+<.header>
+  Dose <%= @dose.id %>
+  <:subtitle>This is a dose record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/doses/#{@dose}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit dose</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Taken at"><%= @dose.taken_at %></:item>
+  <:item title="Quantity"><%= @dose.quantity %></:item>
+</.list>
+
+<.back navigate={~p"/doses"}>Back to doses</.back>
+
+<.modal :if={@live_action == :edit} id="dose-modal" show on_cancel={JS.patch(~p"/doses/#{@dose}")}>
+  <.live_component
+    module={MedtrackWeb.DoseLive.FormComponent}
+    id={@dose.id}
+    title={@page_title}
+    action={@live_action}
+    dose={@dose}
+    patch={~p"/doses/#{@dose}"}
+  />
+</.modal>

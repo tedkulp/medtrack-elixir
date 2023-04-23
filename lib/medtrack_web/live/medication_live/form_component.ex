@@ -53,7 +53,11 @@ defmodule MedtrackWeb.MedicationLive.FormComponent do
   end
 
   defp save_medication(socket, :edit, medication_params) do
-    case Tracker.update_medication(socket.assigns.medication, medication_params) do
+    case Tracker.update_medication(
+           socket.assigns.medication,
+           medication_params,
+           socket.assigns.current_user
+         ) do
       {:ok, medication} ->
         notify_parent({:saved, medication})
 
@@ -68,7 +72,7 @@ defmodule MedtrackWeb.MedicationLive.FormComponent do
   end
 
   defp save_medication(socket, :new, medication_params) do
-    case Tracker.create_medication(medication_params) do
+    case Tracker.create_medication(medication_params, socket.assigns.current_user) do
       {:ok, medication} ->
         notify_parent({:saved, medication})
 

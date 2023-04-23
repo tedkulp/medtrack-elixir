@@ -21,6 +21,12 @@ defmodule Medtrack.Tracker do
     Repo.all(Medication)
   end
 
+  def list_medications(user) do
+    from(Medication)
+    |> where([m], m.user_id == ^user.id)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single medication.
 
@@ -49,7 +55,9 @@ defmodule Medtrack.Tracker do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_medication(attrs \\ %{}) do
+  def create_medication(attrs \\ %{}, user) do
+    attrs = Map.put(attrs, "user_id", user.id)
+
     %Medication{}
     |> Medication.changeset(attrs)
     |> Repo.insert()
@@ -67,10 +75,16 @@ defmodule Medtrack.Tracker do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_medication(%Medication{} = medication, attrs) do
-    medication
-    |> Medication.changeset(attrs)
-    |> Repo.update()
+  def update_medication(%Medication{} = medication, attrs, user) do
+    existing_med = get_medication!(medication.id)
+
+    if existing_med.user_id == user.id do
+      medication = Map.put(medication, "user_id", user.id)
+
+      medication
+      |> Medication.changeset(attrs)
+      |> Repo.update()
+    end
   end
 
   @doc """
@@ -85,8 +99,12 @@ defmodule Medtrack.Tracker do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_medication(%Medication{} = medication) do
-    Repo.delete(medication)
+  def delete_medication(%Medication{} = medication, user) do
+    existing_med = get_medication!(medication.id)
+
+    if existing_med.user_id == user.id do
+      Repo.delete(medication)
+    end
   end
 
   @doc """
@@ -100,5 +118,116 @@ defmodule Medtrack.Tracker do
   """
   def change_medication(%Medication{} = medication, attrs \\ %{}) do
     Medication.changeset(medication, attrs)
+  end
+
+  alias Medtrack.Tracker.Dose
+
+  @doc """
+  Returns the list of doses.
+
+  ## Examples
+
+      iex> list_doses()
+      [%Dose{}, ...]
+
+  """
+  def list_doses(medication_id) do
+    from(Dose)
+    |> where([d], d.medication_id == ^medication_id)
+    |> preload(:medication)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single dose.
+
+  Raises `Ecto.NoResultsError` if the Dose does not exist.
+
+  ## Examples
+
+      iex> get_dose!(123)
+      %Dose{}
+
+      iex> get_dose!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_dose!(id), do: Repo.get!(Dose, id)
+
+  @doc """
+  Creates a dose.
+
+  ## Examples
+
+      iex> create_dose(%{field: value})
+      {:ok, %Dose{}}
+
+      iex> create_dose(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_dose(attrs \\ %{}, medication_id) do
+    attrs = Map.put(attrs, "medication_id", medication_id)
+
+    %Dose{}
+    |> Dose.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a dose.
+
+  ## Examples
+
+      iex> update_dose(dose, %{field: new_value}, 1)
+      {:ok, %Dose{}}
+
+      iex> update_dose(dose, %{field: bad_value}, 1)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_dose(%Dose{} = dose, attrs, medication_id) do
+    existing_dose = get_dose!(dose.id)
+
+    if existing_dose.id == dose.id do
+      dose = Map.put(dose, "medication_id", medication_id)
+
+      dose
+      |> Dose.changeset(attrs)
+      |> Repo.update()
+    end
+  end
+
+  @doc """
+  Deletes a dose.
+
+  ## Examples
+
+      iex> delete_dose(dose)
+      {:ok, %Dose{}}
+
+      iex> delete_dose(dose)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_dose(%Dose{} = dose, medication_id) do
+    existing_dose = get_dose!(dose.id)
+
+    if to_string(existing_dose.medication_id) == to_string(medication_id) do
+      Repo.delete(dose)
+    end
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking dose changes.
+
+  ## Examples
+
+      iex> change_dose(dose)
+      %Ecto.Changeset{data: %Dose{}}
+
+  """
+  def change_dose(%Dose{} = dose, attrs \\ %{}) do
+    Dose.changeset(dose, attrs)
   end
 end

@@ -1,9 +1,7 @@
-defmodule MedtrackWeb.MedicationLive.Show do
+defmodule MedtrackWeb.DoseLive.Show do
   use MedtrackWeb, :live_view
 
   alias Medtrack.Tracker
-
-  on_mount {MedtrackWeb.UserAuth, :ensure_authenticated}
 
   @impl true
   def mount(_params, _session, socket) do
@@ -15,9 +13,9 @@ defmodule MedtrackWeb.MedicationLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:medication, Tracker.get_medication!(id))}
+     |> assign(:dose, Tracker.get_dose!(id))}
   end
 
-  defp page_title(:show), do: "Show Medication"
-  defp page_title(:edit), do: "Edit Medication"
+  defp page_title(:show), do: "Show Dose"
+  defp page_title(:edit), do: "Edit Dose"
 end

@@ -29,13 +29,19 @@
   </:action>
 </.table>
 
-<.modal :if={@live_action in [:new, :edit]} id="medication-modal" show on_cancel={JS.patch(~p"/medications")}>
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="medication-modal"
+  show
+  on_cancel={JS.patch(~p"/medications")}
+>
   <.live_component
     module={MedtrackWeb.MedicationLive.FormComponent}
     id={@medication.id || :new}
     title={@page_title}
     action={@live_action}
     medication={@medication}
+    current_user={@current_user}
     patch={~p"/medications"}
   />
 </.modal>

@@ -4,9 +4,11 @@ defmodule MedtrackWeb.MedicationLive.Index do
   alias Medtrack.Tracker
   alias Medtrack.Tracker.Medication
 
+  on_mount {MedtrackWeb.UserAuth, :ensure_authenticated}
+
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :medications, Tracker.list_medications())}
+    {:ok, stream(socket, :medications, Tracker.list_medications(socket.assigns.current_user))}
   end
 
   @impl true
@@ -40,7 +42,7 @@ defmodule MedtrackWeb.MedicationLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     medication = Tracker.get_medication!(id)
-    {:ok, _} = Tracker.delete_medication(medication)
+    {:ok, _} = Tracker.delete_medication(medication, socket.assigns.current_user)
 
     {:noreply, stream_delete(socket, :medications, medication)}
   end
