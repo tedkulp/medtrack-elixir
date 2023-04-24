@@ -4,8 +4,6 @@ defmodule MedtrackWeb.RefillLive.Index do
   alias Medtrack.Tracker
   alias Medtrack.Tracker.Refill
 
-  on_mount {MedtrackWeb.UserAuth, :ensure_authenticated}
-
   @impl true
   def mount(params, _session, socket) do
     {:ok, stream(socket, :refills, Tracker.list_refills(params["medication_id"]))}

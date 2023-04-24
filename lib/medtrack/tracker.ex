@@ -6,7 +6,9 @@ defmodule Medtrack.Tracker do
   import Ecto.Query, warn: false
   alias Medtrack.Repo
 
+  alias Medtrack.Tracker.Dose
   alias Medtrack.Tracker.Medication
+  alias Medtrack.Tracker.Refill
 
   @doc """
   Returns the list of medications.
@@ -42,6 +44,21 @@ defmodule Medtrack.Tracker do
 
   """
   def get_medication!(id), do: Repo.get!(Medication, id)
+
+  def get_remaining_count!(medication_id) do
+    refill = get_last_refill!(medication_id)
+
+    if !refill do
+      0
+    else
+      taken_count =
+        from(Dose)
+        |> where([d], d.taken_at >= ^refill.filled_at and d.medication_id == ^medication_id)
+        |> Repo.aggregate(:sum, :quantity) || 0
+
+      refill.quantity - taken_count
+    end
+  end
 
   @doc """
   Creates a medication.
@@ -120,8 +137,6 @@ defmodule Medtrack.Tracker do
     Medication.changeset(medication, attrs)
   end
 
-  alias Medtrack.Tracker.Dose
-
   @doc """
   Returns the list of doses.
 
@@ -153,6 +168,15 @@ defmodule Medtrack.Tracker do
 
   """
   def get_dose!(id), do: Repo.get!(Dose, id)
+
+  def get_last_dose!(medication_id) do
+    from(d in Dose,
+      where: d.medication_id == ^medication_id,
+      order_by: [desc: d.taken_at],
+      limit: 1
+    )
+    |> Repo.one!()
+  end
 
   @doc """
   Creates a dose.
@@ -231,8 +255,6 @@ defmodule Medtrack.Tracker do
     Dose.changeset(dose, attrs)
   end
 
-  alias Medtrack.Tracker.Refill
-
   @doc """
   Returns the list of refills.
 
@@ -264,6 +286,15 @@ defmodule Medtrack.Tracker do
 
   """
   def get_refill!(id), do: Repo.get!(Refill, id)
+
+  def get_last_refill!(medication_id) do
+    from(r in Refill,
+      where: r.medication_id == ^medication_id,
+      order_by: [desc: r.filled_at],
+      limit: 1
+    )
+    |> Repo.one!()
+  end
 
   @doc """
   Creates a refill.

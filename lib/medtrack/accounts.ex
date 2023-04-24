@@ -4,9 +4,12 @@ defmodule Medtrack.Accounts do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
   alias Medtrack.Repo
 
   alias Medtrack.Accounts.{User, UserToken, UserNotifier}
+
+  import MedTrackWeb.API.Auth
 
   ## Database getters
 
@@ -24,6 +27,20 @@ defmodule Medtrack.Accounts do
   """
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
+  end
+
+  def get_api_key(user) do
+    api_key = user.api_key
+
+    if !api_key do
+      api_key = generate_token(user.id)
+
+      user
+      |> cast(%{api_key: api_key}, [:api_key])
+      |> Repo.update!()
+    end
+
+    api_key
   end
 
   @doc """

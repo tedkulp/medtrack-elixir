@@ -4,8 +4,6 @@ defmodule MedtrackWeb.MedicationLive.Index do
   alias Medtrack.Tracker
   alias Medtrack.Tracker.Medication
 
-  on_mount {MedtrackWeb.UserAuth, :ensure_authenticated}
-
   @impl true
   def mount(_params, _session, socket) do
     {:ok, stream(socket, :medications, Tracker.list_medications(socket.assigns.current_user))}

@@ -4,54 +4,58 @@ defmodule MedtrackWeb.Router do
   import MedtrackWeb.UserAuth
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_live_flash
-    plug :put_root_layout, {MedtrackWeb.Layouts, :root}
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-    plug :fetch_current_user
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, {MedtrackWeb.Layouts, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+    plug(:fetch_current_user)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/", MedtrackWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through([:browser, :require_authenticated_user])
 
-    live "/medications", MedicationLive.Index, :index
-    live "/medications/new", MedicationLive.Index, :new
-    live "/medications/:id/edit", MedicationLive.Index, :edit
+    live_session :tracker, on_mount: {MedtrackWeb.UserAuth, :ensure_authenticated} do
+      live("/medications", MedicationLive.Index, :index)
+      live("/medications/new", MedicationLive.Index, :new)
+      live("/medications/:id/edit", MedicationLive.Index, :edit)
 
-    live "/medications/:id", MedicationLive.Show, :show
-    live "/medications/:id/show/edit", MedicationLive.Show, :edit
+      live("/medications/:id", MedicationLive.Show, :show)
+      live("/medications/:id/show/edit", MedicationLive.Show, :edit)
 
-    live "/medications/:medication_id/doses", DoseLive.Index, :index
-    live "/medications/:medication_id/doses/new", DoseLive.Index, :new
-    live "/medications/:medication_id/doses/:id/edit", DoseLive.Index, :edit
+      live("/medications/:medication_id/doses", DoseLive.Index, :index)
+      live("/medications/:medication_id/doses/new", DoseLive.Index, :new)
+      live("/medications/:medication_id/doses/:id/edit", DoseLive.Index, :edit)
 
-    live "/medications/:medication_id/doses/:id", DoseLive.Show, :show
-    live "/medications/:medication_id/doses/:id/show/edit", DoseLive.Show, :edit
+      live("/medications/:medication_id/doses/:id", DoseLive.Show, :show)
+      live("/medications/:medication_id/doses/:id/show/edit", DoseLive.Show, :edit)
 
-    live "/medications/:medication_id/refills", RefillLive.Index, :index
-    live "/medications/:medication_id/refills/new", RefillLive.Index, :new
-    live "/medications/:medication_id/refills/:id/edit", RefillLive.Index, :edit
+      live("/medications/:medication_id/refills", RefillLive.Index, :index)
+      live("/medications/:medication_id/refills/new", RefillLive.Index, :new)
+      live("/medications/:medication_id/refills/:id/edit", RefillLive.Index, :edit)
 
-    live "/medications/:medication_id/refills/:id", RefillLive.Show, :show
-    live "/medications/:medication_id/refills/:id/show/edit", RefillLive.Show, :edit
+      live("/medications/:medication_id/refills/:id", RefillLive.Show, :show)
+      live("/medications/:medication_id/refills/:id/show/edit", RefillLive.Show, :edit)
+    end
   end
 
   scope "/", MedtrackWeb do
-    pipe_through :browser
+    pipe_through(:browser)
 
-    get "/", PageController, :home
+    get("/", PageController, :home)
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", MedtrackWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", MedtrackWeb do
+    pipe_through(:api)
+
+    get("/stats", API.TrackerController, :stats)
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:medtrack, :dev_routes) do
@@ -63,48 +67,48 @@ defmodule MedtrackWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through :browser
+      pipe_through(:browser)
 
-      live_dashboard "/dashboard", metrics: MedtrackWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      live_dashboard("/dashboard", metrics: MedtrackWeb.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 
   ## Authentication routes
 
   scope "/", MedtrackWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
+    pipe_through([:browser, :redirect_if_user_is_authenticated])
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{MedtrackWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/register", UserRegistrationLive, :new
-      live "/users/log_in", UserLoginLive, :new
-      live "/users/reset_password", UserForgotPasswordLive, :new
-      live "/users/reset_password/:token", UserResetPasswordLive, :edit
+      live("/users/register", UserRegistrationLive, :new)
+      live("/users/log_in", UserLoginLive, :new)
+      live("/users/reset_password", UserForgotPasswordLive, :new)
+      live("/users/reset_password/:token", UserResetPasswordLive, :edit)
     end
 
-    post "/users/log_in", UserSessionController, :create
+    post("/users/log_in", UserSessionController, :create)
   end
 
   scope "/", MedtrackWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through([:browser, :require_authenticated_user])
 
     live_session :require_authenticated_user,
       on_mount: [{MedtrackWeb.UserAuth, :ensure_authenticated}] do
-      live "/users/settings", UserSettingsLive, :edit
-      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live("/users/settings", UserSettingsLive, :edit)
+      live("/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email)
     end
   end
 
   scope "/", MedtrackWeb do
-    pipe_through [:browser]
+    pipe_through([:browser])
 
-    delete "/users/log_out", UserSessionController, :delete
+    delete("/users/log_out", UserSessionController, :delete)
 
     live_session :current_user,
       on_mount: [{MedtrackWeb.UserAuth, :mount_current_user}] do
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
+      live("/users/confirm/:token", UserConfirmationLive, :edit)
+      live("/users/confirm", UserConfirmationInstructionsLive, :new)
     end
   end
 end

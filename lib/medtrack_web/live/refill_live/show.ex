@@ -3,8 +3,6 @@ defmodule MedtrackWeb.RefillLive.Show do
 
   alias Medtrack.Tracker
 
-  on_mount {MedtrackWeb.UserAuth, :ensure_authenticated}
-
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket}

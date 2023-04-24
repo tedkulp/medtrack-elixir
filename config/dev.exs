@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :medtrack, Medtrack.Repo,
-  username: "authentikuser",
-  password: "userauthentik",
+  username: "postgres",
+  password: "postgres",
   hostname: "localhost",
   database: "medtrack_dev",
   stacktrace: true,

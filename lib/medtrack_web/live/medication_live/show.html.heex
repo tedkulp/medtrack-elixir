@@ -1,6 +1,6 @@
 <.header>
-  Medication <%= @medication.id %>
-  <:subtitle>This is a medication record from your database.</:subtitle>
+  <%= @medication.name %>
+  <!-- <:subtitle>This is a medication record from your database.</:subtitle> -->
   <:actions>
     <.link patch={~p"/medications/#{@medication}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit medication</.button>
@@ -8,13 +8,26 @@
   </:actions>
 </.header>
 
-<.list>
-  <:item title="Name"><%= @medication.name %></:item>
-</.list>
+<div>
+  Last Dose: <strong><%= @last_dose.taken_at %></strong>
+</div>
+
+<div>
+  Last Refill: <strong><%= @last_refill.filled_at %></strong>
+</div>
+
+<div>
+  Remaining: <strong><%= @remaining_count %></strong>
+</div>
 
 <.back navigate={~p"/medications"}>Back to medications</.back>
 
-<.modal :if={@live_action == :edit} id="medication-modal" show on_cancel={JS.patch(~p"/medications/#{@medication}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="medication-modal"
+  show
+  on_cancel={JS.patch(~p"/medications/#{@medication}")}
+>
   <.live_component
     module={MedtrackWeb.MedicationLive.FormComponent}
     id={@medication.id}

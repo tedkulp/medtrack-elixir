@@ -12,6 +12,22 @@ defmodule MedtrackWeb.UserSettingsLive do
 
     <div class="space-y-12 divide-y">
       <div>
+        <div class="mt-10 space-y-8 bg-white">
+          <div class="phx-no-feedback">
+            <label class="block text-sm font-semibold leading-6 text-zinc-800">API Key</label>
+            <input
+              value={@api_key}
+              type="text"
+              class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 border-zinc-300"
+              readonly
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-12 divide-y">
+      <div>
         <.simple_form
           for={@email_form}
           id="email_form"
@@ -99,6 +115,7 @@ defmodule MedtrackWeb.UserSettingsLive do
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:trigger_submit, false)
+      |> assign(:api_key, Accounts.get_api_key(user))
 
     {:ok, socket}
   end
