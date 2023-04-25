@@ -1,8 +1,9 @@
 # Use an official Elixir runtime as a parent image.
-FROM elixir:latest
+FROM elixir:1.14.4-otp-24-alpine
 
-RUN apt-get update && \
-  apt-get install -y postgresql-client
+RUN apk add postgresql-client bash inotify-tools alpine-sdk
+# RUN apt-get update && \
+#   apt-get install -y postgresql-client
 
 # Create app directory and copy the Elixir projects into it.
 RUN mkdir /app
@@ -19,6 +20,6 @@ RUN mix local.rebar --force
 RUN mix deps.get
 
 # Compile the project.
-RUN mix do compile
+RUN mix do compile --force
 
 CMD ["/app/entrypoint.sh"]
