@@ -45,6 +45,10 @@ defmodule Medtrack.Tracker do
   """
   def get_medication!(id), do: Repo.get!(Medication, id)
 
+  def get_medication_by_name!(name, user) do
+    Repo.get_by(Medication, name: name, user_id: user.id)
+  end
+
   def get_remaining_count!(medication_id) do
     refill = get_last_refill!(medication_id)
 

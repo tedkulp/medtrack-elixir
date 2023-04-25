@@ -1,5 +1,5 @@
 # Taken from: https://dev.to/mnishiguchi/simple-token-authentication-for-phoenix-json-api-1m05
-defmodule MedTrackWeb.API.Auth do
+defmodule MedtrackWeb.API.Auth do
   @moduledoc """
   A module plug that verifies the bearer token in the request headers and
   assigns `:current_user`. The authorization header value may look like
@@ -9,8 +9,6 @@ defmodule MedTrackWeb.API.Auth do
   import Plug.Conn
   import Phoenix.Controller
 
-  @secret_key_base "klsdflkjsdlfkjweoisflkjsdlkj2309230r9sdflkxjcvlkjw4trlkjelkjdvjkflkjqrlkjwrtlkjdlkjxcvlkj"
-
   def init(opts), do: opts
 
   def call(conn, _opts) do
@@ -18,7 +16,7 @@ defmodule MedTrackWeb.API.Auth do
     |> get_token()
     |> verify_token()
     |> case do
-      {:ok, user_id} -> assign(conn, :current_user, user_id)
+      {:ok, user_id} -> assign(conn, :current_user, Medtrack.Accounts.get_user!(user_id))
       _unauthorized -> assign(conn, :current_user, nil)
     end
   end
@@ -42,7 +40,7 @@ defmodule MedTrackWeb.API.Auth do
       conn
       |> put_status(:unauthorized)
       |> put_view(MedTrackWeb.ErrorView)
-      |> render(:"401")
+      |> json(%{error: "Unauthorized"})
       # Stop any downstream transformations.
       |> halt()
     end
@@ -59,7 +57,7 @@ defmodule MedTrackWeb.API.Auth do
   """
   def generate_token(user_id) do
     Phoenix.Token.sign(
-      @secret_key_base,
+      MedtrackWeb.Endpoint,
       inspect(__MODULE__),
       user_id
     )
@@ -86,7 +84,7 @@ defmodule MedTrackWeb.API.Auth do
   @spec verify_token(nil | binary) :: {:error, :expired | :invalid | :missing} | {:ok, any}
   def verify_token(token) do
     Phoenix.Token.verify(
-      @secret_key_base,
+      MedtrackWeb.Endpoint,
       inspect(__MODULE__),
       token
     )

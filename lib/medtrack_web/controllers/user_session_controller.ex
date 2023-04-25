@@ -21,6 +21,10 @@ defmodule MedtrackWeb.UserSessionController do
   defp create(conn, %{"user" => user_params}, info) do
     %{"email" => email, "password" => password} = user_params
 
+    IO.puts("-----------------")
+    IO.inspect(Accounts.get_user_by_email_and_password(email, password))
+    IO.puts("-----------------")
+
     if user = Accounts.get_user_by_email_and_password(email, password) do
       conn
       |> put_flash(:info, info)

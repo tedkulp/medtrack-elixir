@@ -9,7 +9,7 @@ defmodule Medtrack.Accounts do
 
   alias Medtrack.Accounts.{User, UserToken, UserNotifier}
 
-  import MedTrackWeb.API.Auth
+  import MedtrackWeb.API.Auth
 
   ## Database getters
 

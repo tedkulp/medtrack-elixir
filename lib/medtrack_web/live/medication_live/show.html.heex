@@ -9,11 +9,15 @@
 </.header>
 
 <div>
-  Last Dose: <strong><%= @last_dose.taken_at %></strong>
+  <.link navigate={~p"/medications/#{@medication}/doses"}>
+    Last Dose: <strong><%= @last_dose.taken_at %></strong>
+  </.link>
 </div>
 
 <div>
-  Last Refill: <strong><%= @last_refill.filled_at %></strong>
+  <.link navigate={~p"/medications/#{@medication}/refills"}>
+    Last Refill: <strong><%= @last_refill.filled_at %></strong>
+  </.link>
 </div>
 
 <div>

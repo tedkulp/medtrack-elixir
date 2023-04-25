@@ -2,6 +2,7 @@ defmodule MedtrackWeb.Router do
   use MedtrackWeb, :router
 
   import MedtrackWeb.UserAuth
+  import MedtrackWeb.API.Auth
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -15,6 +16,7 @@ defmodule MedtrackWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
+    plug(MedtrackWeb.API.Auth)
   end
 
   scope "/", MedtrackWeb do
@@ -52,9 +54,10 @@ defmodule MedtrackWeb.Router do
 
   # Other scopes may use custom stacks.
   scope "/api", MedtrackWeb do
-    pipe_through(:api)
+    pipe_through([:api, :authenticate_api_user])
 
     get("/stats", API.TrackerController, :stats)
+    post("/log_dose", API.TrackerController, :log_dose)
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
