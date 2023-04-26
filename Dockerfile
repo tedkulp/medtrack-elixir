@@ -22,4 +22,5 @@ RUN mix deps.get
 # Compile the project.
 RUN mix do compile --force
 
+RUN chmod 755 /app/entrypoint.sh
 CMD ["/app/entrypoint.sh"]
