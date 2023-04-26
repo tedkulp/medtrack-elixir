@@ -14,8 +14,8 @@ defmodule MedtrackWeb.MedicationLive.Show do
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:medication, Tracker.get_medication!(id))
-     |> assign(:last_dose, Tracker.get_last_dose!(id))
-     |> assign(:last_refill, Tracker.get_last_refill!(id))
+     |> assign(:last_dose, Tracker.get_last_dose(id))
+     |> assign(:last_refill, Tracker.get_last_refill(id))
      |> assign(:remaining_count, Tracker.get_remaining_count!(id))}
   end
 

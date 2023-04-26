@@ -50,7 +50,7 @@ defmodule Medtrack.Tracker do
   end
 
   def get_remaining_count!(medication_id) do
-    refill = get_last_refill!(medication_id)
+    refill = get_last_refill(medication_id)
 
     if !refill do
       0
@@ -173,13 +173,22 @@ defmodule Medtrack.Tracker do
   """
   def get_dose!(id), do: Repo.get!(Dose, id)
 
+  def get_last_dose(medication_id) do
+    get_last_dose_query(medication_id)
+    |> Repo.one()
+  end
+
   def get_last_dose!(medication_id) do
+    get_last_dose_query(medication_id)
+    |> Repo.one!()
+  end
+
+  defp get_last_dose_query(medication_id) do
     from(d in Dose,
       where: d.medication_id == ^medication_id,
       order_by: [desc: d.taken_at],
       limit: 1
     )
-    |> Repo.one!()
   end
 
   @doc """
@@ -291,13 +300,22 @@ defmodule Medtrack.Tracker do
   """
   def get_refill!(id), do: Repo.get!(Refill, id)
 
+  def get_last_refill(medication_id) do
+    get_last_refill_query(medication_id)
+    |> Repo.one()
+  end
+
   def get_last_refill!(medication_id) do
+    get_last_refill_query(medication_id)
+    |> Repo.one!()
+  end
+
+  defp get_last_refill_query(medication_id) do
     from(r in Refill,
       where: r.medication_id == ^medication_id,
       order_by: [desc: r.filled_at],
       limit: 1
     )
-    |> Repo.one!()
   end
 
   @doc """

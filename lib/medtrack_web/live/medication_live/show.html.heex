@@ -10,13 +10,13 @@
 
 <div>
   <.link navigate={~p"/medications/#{@medication}/doses"}>
-    Last Dose: <strong><%= @last_dose.taken_at %></strong>
+    Last Dose: <strong><%= if @last_dose, do: @last_dose.taken_at, else: "None" %></strong>
   </.link>
 </div>
 
 <div>
   <.link navigate={~p"/medications/#{@medication}/refills"}>
-    Last Refill: <strong><%= @last_refill.filled_at %></strong>
+    Last Refill: <strong><%= if @last_refill, do: @last_refill.filled_at, else: "None" %></strong>
   </.link>
 </div>
 
