@@ -86,7 +86,8 @@ defmodule MedtrackWeb.API.Auth do
     Phoenix.Token.verify(
       MedtrackWeb.Endpoint,
       inspect(__MODULE__),
-      token
+      token,
+      max_age: 60 * 60 * 24 * 365 * 5
     )
   end
 
