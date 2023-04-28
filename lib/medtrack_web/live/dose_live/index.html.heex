@@ -12,7 +12,9 @@
   rows={@streams.doses}
   row_click={fn {_id, dose} -> JS.navigate(~p"/medications/#{@medication_id}/doses/#{dose}") end}
 >
-  <:col :let={{_id, dose}} label="Taken at"><%= dose.taken_at %></:col>
+  <:col :let={{_id, dose}} label="Taken at">
+    <%= format_time(dose.taken_at, timezone: @timezone) %>
+  </:col>
   <:col :let={{_id, dose}} label="Quantity"><%= dose.quantity %></:col>
   <:action :let={{_id, dose}}>
     <div class="sr-only">

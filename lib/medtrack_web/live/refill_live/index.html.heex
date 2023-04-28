@@ -14,7 +14,9 @@
     fn {_id, refill} -> JS.navigate(~p"/medications/#{@medication_id}/refills/#{refill}") end
   }
 >
-  <:col :let={{_id, refill}} label="Filled at"><%= refill.filled_at %></:col>
+  <:col :let={{_id, refill}} label="Filled at">
+    <%= format_time(refill.filled_at, timezone: @timezone) %>
+  </:col>
   <:col :let={{_id, refill}} label="Quantity"><%= refill.quantity %></:col>
   <:action :let={{_id, refill}}>
     <div class="sr-only">
