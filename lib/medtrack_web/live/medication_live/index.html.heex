@@ -7,27 +7,34 @@
   </:actions>
 </.header>
 
-<.table
-  id="medications"
-  rows={@streams.medications}
-  row_click={fn {_id, medication} -> JS.navigate(~p"/medications/#{medication}") end}
->
-  <:col :let={{_id, medication}} label="Name"><%= medication.name %></:col>
-  <:action :let={{_id, medication}}>
-    <div class="sr-only">
-      <.link navigate={~p"/medications/#{medication}"}>Show</.link>
-    </div>
-    <.link patch={~p"/medications/#{medication}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, medication}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: medication.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
+<div class="flex flex-row-reverse gap-16">
+  <div class="flex-auto basis-3/4" id="medication-chart-wrapper" phx-update="ignore">
+    <canvas id="medication-chart" width="500" height="250" phx-hook="MedicationChart"></canvas>
+  </div>
+  <div class="flex-auto basis-1/4">
+    <.table
+      id="medications"
+      rows={@streams.medications}
+      row_click={fn {_id, medication} -> JS.navigate(~p"/medications/#{medication}") end}
     >
-      Delete
-    </.link>
-  </:action>
-</.table>
+      <:col :let={{_id, medication}} label="Name"><%= medication.name %></:col>
+      <:action :let={{_id, medication}}>
+        <div class="sr-only">
+          <.link navigate={~p"/medications/#{medication}"}>Show</.link>
+        </div>
+        <.link patch={~p"/medications/#{medication}/edit"}>Edit</.link>
+      </:action>
+      <:action :let={{id, medication}}>
+        <.link
+          phx-click={JS.push("delete", value: %{id: medication.id}) |> hide("##{id}")}
+          data-confirm="Are you sure?"
+        >
+          Delete
+        </.link>
+      </:action>
+    </.table>
+  </div>
+</div>
 
 <.modal
   :if={@live_action in [:new, :edit]}

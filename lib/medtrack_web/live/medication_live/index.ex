@@ -44,4 +44,19 @@ defmodule MedtrackWeb.MedicationLive.Index do
 
     {:noreply, stream_delete(socket, :medications, medication)}
   end
+
+  def handle_event("fill-medication-chart", _, socket) do
+    data =
+      Tracker.list_medications(socket.assigns.current_user)
+      |> Enum.map(fn medication ->
+        counts =
+          medication.id
+          |> Tracker.get_dose_counts()
+          |> Enum.map(fn {date, count} -> %{date: date, count: count} end)
+
+        %{name: medication.name, counts: counts}
+      end)
+
+    {:reply, %{data: data}, socket}
+  end
 end

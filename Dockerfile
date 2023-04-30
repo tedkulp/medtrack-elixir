@@ -1,7 +1,7 @@
 # Use an official Elixir runtime as a parent image.
 FROM elixir:1.14.4-otp-24-alpine
 
-RUN apk add postgresql-client bash inotify-tools alpine-sdk
+RUN apk add postgresql-client bash inotify-tools alpine-sdk nodejs npm
 # RUN apt-get update && \
 #   apt-get install -y postgresql-client
 
@@ -21,6 +21,9 @@ RUN mix deps.get
 
 # Compile the project.
 RUN mix do compile --force
+
+# Install Node.js dependencies
+RUN npm install --prefix ./assets
 
 RUN chmod 755 /app/entrypoint.sh
 CMD ["/app/entrypoint.sh"]

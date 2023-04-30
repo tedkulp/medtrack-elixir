@@ -150,12 +150,44 @@ defmodule Medtrack.Tracker do
       [%Dose{}, ...]
 
   """
-  def list_doses(medication_id) do
+  def list_doses(medication_id, options) when is_map(options) do
     from(Dose)
     |> where([d], d.medication_id == ^medication_id)
+    |> sort(options)
+    |> paginate(options)
     |> preload(:medication)
     |> Repo.all()
   end
+
+  def list_doses(medication_id) do
+    list_doses(medication_id, %{sort_by: :taken_at, sort_order: :asc})
+  end
+
+  def get_dose_counts(medication_id) do
+    from(Dose)
+    |> where([d], d.medication_id == ^medication_id)
+    |> count_by_month(:taken_at)
+    |> Repo.all()
+    |> Enum.map(fn [month, year, count] ->
+      {format_month_year(month, year), count || 0}
+    end)
+  end
+
+  defp sort(query, %{sort_by: sort_by, sort_order: sort_order}) do
+    order_by(query, {^sort_order, ^sort_by})
+  end
+
+  defp sort(query, _options), do: query
+
+  defp paginate(query, %{page: page, per_page: per_page}) do
+    offset = max((page - 1) * per_page, 0)
+
+    query
+    |> limit(^per_page)
+    |> offset(^offset)
+  end
+
+  defp paginate(query, _options), do: query
 
   @doc """
   Gets a single dose.
@@ -393,5 +425,34 @@ defmodule Medtrack.Tracker do
   """
   def change_refill(%Refill{} = refill, attrs \\ %{}) do
     Refill.changeset(refill, attrs)
+  end
+
+  defp count_by_month(query, date_field) do
+    query
+    |> group_by(
+      [r],
+      fragment(
+        "date_part('month', ?), date_part('year', ?)",
+        field(r, ^date_field),
+        field(r, ^date_field)
+      )
+    )
+    |> select([r], [
+      fragment(
+        "date_part('month', ?)",
+        field(r, ^date_field)
+      ),
+      fragment(
+        "date_part('year', ?)",
+        field(r, ^date_field)
+      ),
+      count("*")
+    ])
+  end
+
+  defp format_month_year(month, year) do
+    month = month |> round |> Integer.to_string() |> String.pad_leading(2, "0")
+    year = year |> round |> Integer.to_string() |> String.pad_leading(4, "0")
+    "#{year}-#{month}"
   end
 end

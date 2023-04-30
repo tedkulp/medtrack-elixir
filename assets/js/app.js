@@ -21,14 +21,22 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
+import MedicationChart from './medication-chart'
+
+const hooks = {
+  MedicationChart,
+}
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {
-  _csrf_token: csrfToken,
-  locale: Intl.NumberFormat().resolvedOptions().locale,
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  timezone_offset: -(new Date().getTimezoneOffset() / 60),
-}})
+let liveSocket = new LiveSocket("/live", Socket, {
+  params: {
+    _csrf_token: csrfToken,
+    locale: Intl.NumberFormat().resolvedOptions().locale,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timezone_offset: -(new Date().getTimezoneOffset() / 60),
+  },
+  hooks,
+})
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
