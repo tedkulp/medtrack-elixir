@@ -433,20 +433,32 @@ defmodule Medtrack.Tracker do
       [r],
       fragment(
         "date_part('month', ?), date_part('year', ?)",
-        field(r, ^date_field),
-        field(r, ^date_field)
+        type(field(r, ^date_field), :date),
+        type(field(r, ^date_field), :date)
       )
+    )
+    |> order_by([r],
+      asc:
+        fragment(
+          "date_part('year', ?)",
+          type(field(r, ^date_field), :date)
+        ),
+      asc:
+        fragment(
+          "date_part('month', ?)",
+          type(field(r, ^date_field), :date)
+        )
     )
     |> select([r], [
       fragment(
         "date_part('month', ?)",
-        field(r, ^date_field)
+        type(field(r, ^date_field), :date)
       ),
       fragment(
         "date_part('year', ?)",
-        field(r, ^date_field)
+        type(field(r, ^date_field), :date)
       ),
-      count("*")
+      sum(type(r.quantity, :integer))
     ])
   end
 
