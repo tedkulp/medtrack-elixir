@@ -30,7 +30,9 @@ defmodule Medtrack.DateTimeUtil do
 
   """
   @spec format_time(DateTime.t(), nil | list | map) :: binary
-  def format_time(datetime, options \\ []) do
+  def format_time(datetime, options \\ [])
+
+  def format_time(datetime, options) when datetime != nil do
     locale = options[:locale] || @default_locale
     timezone = options[:timezone] || @default_timezone
     format = options[:format] || @default_format
@@ -47,5 +49,9 @@ defmodule Medtrack.DateTimeUtil do
       {:error, _reason} ->
         Timex.format!(datetime, "{ISO:Extended}")
     end
+  end
+
+  def format_time(_, _) do
+    "N/A"
   end
 end
