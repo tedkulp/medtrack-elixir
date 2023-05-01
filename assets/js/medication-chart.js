@@ -1,31 +1,50 @@
 import Chart from "chart.js/auto";
 
+let newChart = true;
+
+const updateChart = (_this, data) => {
+  if (newChart) {
+    _this.medicationChart = new Chart(_this.el, {
+      type: "bar",
+      options: {
+        parsing: {
+          xAxisKey: 'date',
+          yAxisKey: 'count',
+        },
+      },
+      data: {
+        datasets: data.map(med => {
+          return {
+            label: med.name,
+            data: med.counts,
+          };
+        }),
+      },
+    });
+    newChart = false;
+  } else {
+    _this.medicationChart.data.datasets = data.map(med => {
+      return {
+        label: med.name,
+        data: med.counts,
+      };
+    });
+    _this.medicationChart.update();
+  }
+};
+
 const MedicationChart = {
   mounted() {
-    console.log("mounted", Chart, this.el);
-
     const _this = this;
 
     this.pushEvent("fill-medication-chart", {}, (reply, ref) => {
-      const data = reply.data;
+      console.log("data in pushEvent", reply.data);
+      updateChart(_this, reply.data);
+    });
 
-      _this.medicationChart = new Chart(_this.el, {
-        type: "bar",
-        options: {
-          parsing: {
-            xAxisKey: 'date',
-            yAxisKey: 'count',
-          },
-        },
-        data: {
-          datasets: data.map(med => {
-            return {
-              label: med.name,
-              data: med.counts,
-            };
-          }),
-        },
-      });
+    this.handleEvent("update-medication-chart", (reply) => {
+      console.log("data in handleEvent", reply.data);
+      updateChart(_this, reply.data);
     });
   },
   destroyed() {

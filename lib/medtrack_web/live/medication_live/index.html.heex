@@ -11,7 +11,7 @@
   <div class="flex-auto basis-3/4" id="medication-chart-wrapper" phx-update="ignore">
     <canvas id="medication-chart" width="500" height="250" phx-hook="MedicationChart"></canvas>
   </div>
-  <div class="flex-auto basis-1/4">
+  <div id="medication-list" class="flex-auto basis-1/4" phx-update="stream">
     <div :for={{id, medication} <- @streams.medications} id={id}>
       <a
         phx-click={JS.navigate(~p"/medications/#{medication}")}
@@ -21,10 +21,16 @@
           <%= medication.name %>
         </h5>
         <p class="font-normal text-sm text-gray-700 dark:text-gray-200">
-          Last Taken: <%= format_time(get_last_dose(medication), timezone: @timezone, format: :short) %>
+          Last Taken: <%= format_time(get_last_dose(medication),
+            timezone: @timezone,
+            format: :short
+          ) %>
         </p>
         <p class="font-normal text-sm text-gray-700 dark:text-gray-200">
-          Last Refill: <%= format_time(get_last_refill(medication), timezone: @timezone, format: :short) %>
+          Last Refill: <%= format_time(get_last_refill(medication),
+            timezone: @timezone,
+            format: :short
+          ) %>
         </p>
         <p class="font-normal text-sm text-gray-700 dark:text-gray-200">
           Remaining (approx): <%= get_remaining_count(medication) %>

@@ -4,6 +4,8 @@ defmodule MedtrackWeb.MedicationLive.Index do
   alias Medtrack.Tracker
   alias Medtrack.Tracker.Medication
 
+  import Logger
+
   import Medtrack.DateTimeUtil, only: [format_time: 2]
 
   @default_locale "en"
@@ -12,7 +14,13 @@ defmodule MedtrackWeb.MedicationLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket) do
+      Medtrack.Tracker.subscribe()
+    end
+
     socket = assign_locale(socket)
+    debug("#{inspect(Tracker.list_medications(socket.assigns.current_user), pretty: true)}")
+
     {:ok, stream(socket, :medications, Tracker.list_medications(socket.assigns.current_user))}
   end
 
@@ -51,6 +59,19 @@ defmodule MedtrackWeb.MedicationLive.Index do
     {:noreply, stream_insert(socket, :medications, medication)}
   end
 
+  def handle_info({:dose_created, dose}, socket) do
+    debug("dose_created handle_info: #{inspect(dose)}")
+
+    medication = Tracker.get_medication!(dose.medication_id)
+
+    socket =
+      socket
+      |> stream_insert(:medications, medication)
+      |> push_event("update-medication-chart", %{data: calculate_chart_values(socket)})
+
+    {:noreply, socket}
+  end
+
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     medication = Tracker.get_medication!(id)
@@ -60,18 +81,20 @@ defmodule MedtrackWeb.MedicationLive.Index do
   end
 
   def handle_event("fill-medication-chart", _, socket) do
-    data =
-      Tracker.list_medications(socket.assigns.current_user)
-      |> Enum.map(fn medication ->
-        counts =
-          medication.id
-          |> Tracker.get_dose_counts()
-          |> Enum.map(fn {date, count} -> %{date: date, count: count} end)
-
-        %{name: medication.name, counts: counts}
-      end)
-
+    data = calculate_chart_values(socket)
     {:reply, %{data: data}, socket}
+  end
+
+  defp calculate_chart_values(socket) do
+    Tracker.list_medications(socket.assigns.current_user)
+    |> Enum.map(fn medication ->
+      counts =
+        medication.id
+        |> Tracker.get_dose_counts()
+        |> Enum.map(fn {date, count} -> %{date: date, count: count} end)
+
+      %{name: medication.name, counts: counts}
+    end)
   end
 
   defp get_last_dose(medication) do

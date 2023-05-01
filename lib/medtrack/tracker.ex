@@ -10,6 +10,20 @@ defmodule Medtrack.Tracker do
   alias Medtrack.Tracker.Medication
   alias Medtrack.Tracker.Refill
 
+  @pub_sub_topic "medications"
+
+  def subscribe() do
+    Phoenix.PubSub.subscribe(Medtrack.PubSub, @pub_sub_topic)
+  end
+
+  def broadcast({:ok, dose}, tag) do
+    Phoenix.PubSub.broadcast(Medtrack.PubSub, @pub_sub_topic, {tag, dose})
+
+    {:ok, dose}
+  end
+
+  def broadcast({:error, _changeset} = error, _tag), do: error
+
   @doc """
   Returns the list of medications.
 
@@ -241,6 +255,7 @@ defmodule Medtrack.Tracker do
     %Dose{}
     |> Dose.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:dose_created)
   end
 
   @doc """
