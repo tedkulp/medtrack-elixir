@@ -7,11 +7,15 @@
   </:actions>
 </.header>
 
-<div class="flex flex-row-reverse gap-16">
-  <div class="flex-auto basis-3/4" id="medication-chart-wrapper" phx-update="ignore">
-    <canvas id="medication-chart" width="500" height="250" phx-hook="MedicationChart"></canvas>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-16">
+  <div
+    class="col-span-1 md:col-span-2 order-last"
+    id="medication-chart-wrapper"
+    phx-update="ignore"
+  >
+    <canvas id="medication-chart" phx-hook="MedicationChart"></canvas>
   </div>
-  <div id="medication-list" class="flex-auto basis-1/4" phx-update="stream">
+  <div id="medication-list" class="col-span-1 order-first mt-5" phx-update="stream">
     <div :for={{id, medication} <- @streams.medications} id={id}>
       <a
         phx-click={JS.navigate(~p"/medications/#{medication}")}

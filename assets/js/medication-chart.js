@@ -1,9 +1,7 @@
 import Chart from "chart.js/auto";
 
-let newChart = true;
-
 const updateChart = (_this, data) => {
-  if (newChart) {
+  if (!_this.medicationChart) {
     _this.medicationChart = new Chart(_this.el, {
       type: "bar",
       options: {
@@ -21,7 +19,6 @@ const updateChart = (_this, data) => {
         }),
       },
     });
-    newChart = false;
   } else {
     _this.medicationChart.data.datasets = data.map(med => {
       return {
