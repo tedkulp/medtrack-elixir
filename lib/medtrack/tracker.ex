@@ -333,11 +333,17 @@ defmodule Medtrack.Tracker do
       [%Refill{}, ...]
 
   """
-  def list_refills(medication_id) do
+  def list_refills(medication_id, options) when is_map(options) do
     from(Refill)
     |> where([d], d.medication_id == ^medication_id)
+    |> sort(options)
+    |> paginate(options)
     |> preload(:medication)
     |> Repo.all()
+  end
+
+  def list_refills(medication_id) do
+    list_refills(medication_id, %{sort_by: :filled_at, sort_order: :asc})
   end
 
   def count_refills(medication_id) do
