@@ -1,6 +1,5 @@
 <.header>
-  <%= @medication.name %>
-  <!-- <:subtitle>This is a medication record from your database.</:subtitle> -->
+  <h1 class="text-3xl font-bold"><%= @medication.name %></h1>
   <:actions>
     <.link patch={~p"/medications/#{@medication}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit medication</.button>
@@ -8,23 +7,36 @@
   </:actions>
 </.header>
 
-<div>
-  <.link navigate={~p"/medications/#{@medication}/doses"}>
+<div class="mt-6">
+  <h2 class="text-xl font-bold mt-4 hover:underline">
+    <.link navigate={~p"/medications/#{@medication}/doses"}>
+      Doses
+    </.link>
+  </h2>
+
+  <div>
     Last Dose:
     <strong>
-      <%= if @last_dose, do: format_time(@last_dose.taken_at, timezone: @timezone), else: "None" %>
+      <%= if @last_dose,
+        do: format_time(@last_dose.taken_at, timezone: @timezone, format: :short),
+        else: "None" %>
     </strong>
-  </.link>
-</div>
+    <br />Total Number of Doses: <strong><%= @dose_count %></strong>
+  </div>
 
-<div>
-  <.link navigate={~p"/medications/#{@medication}/refills"}>
-    Last Refill: <strong><%= if @last_refill, do: format_time(@last_refill.filled_at, timezone: @timezone), else: "None" %></strong>
-  </.link>
-</div>
-
-<div>
-  Remaining: <strong><%= @remaining_count %></strong>
+  <h2 class="text-xl font-bold mt-4 hover:underline">
+    <.link navigate={~p"/medications/#{@medication}/refills"}>Refills</.link>
+  </h2>
+  <div>
+    Last Refill:
+    <strong>
+      <%= if @last_refill,
+        do: format_time(@last_refill.filled_at, timezone: @timezone, format: :short),
+        else: "None" %>
+    </strong>
+    <br />Remaining (approx): <strong><%= @remaining_count %></strong>
+    <br />Total Number of Refills: <strong><%= @refill_count %></strong>
+  </div>
 </div>
 
 <.back navigate={~p"/medications"}>Back to medications</.back>

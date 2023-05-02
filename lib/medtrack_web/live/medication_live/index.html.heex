@@ -19,7 +19,7 @@
     <div :for={{id, medication} <- @streams.medications} id={id}>
       <a
         phx-click={JS.navigate(~p"/medications/#{medication}")}
-        class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 mb-1"
+        class="block max-w-sm p-3 md:p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 mb-1"
       >
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           <%= medication.name %>

@@ -165,16 +165,25 @@ defmodule Medtrack.Tracker do
 
   """
   def list_doses(medication_id, options) when is_map(options) do
-    from(Dose)
-    |> where([d], d.medication_id == ^medication_id)
-    |> sort(options)
-    |> paginate(options)
+    doses_query(medication_id, options)
     |> preload(:medication)
     |> Repo.all()
   end
 
   def list_doses(medication_id) do
     list_doses(medication_id, %{sort_by: :taken_at, sort_order: :asc})
+  end
+
+  def count_doses(medication_id) do
+    doses_query(medication_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp doses_query(medication_id, options \\ %{}) do
+    from(Dose)
+    |> where([d], d.medication_id == ^medication_id)
+    |> sort(options)
+    |> paginate(options)
   end
 
   def get_dose_counts(medication_id) do
@@ -329,6 +338,12 @@ defmodule Medtrack.Tracker do
     |> where([d], d.medication_id == ^medication_id)
     |> preload(:medication)
     |> Repo.all()
+  end
+
+  def count_refills(medication_id) do
+    from(Refill)
+    |> where([d], d.medication_id == ^medication_id)
+    |> Repo.aggregate(:count, :id)
   end
 
   @doc """
