@@ -35,18 +35,14 @@ const MedicationChart = {
     const _this = this;
 
     this.pushEvent("fill-medication-chart", {}, (reply, ref) => {
-      console.log("data in pushEvent", reply.data);
       updateChart(_this, reply.data);
     });
 
     this.handleEvent("update-medication-chart", (reply) => {
-      console.log("data in handleEvent", reply.data);
       updateChart(_this, reply.data);
     });
   },
   destroyed() {
-    console.log("destroyed", this.medicationChart);
-
     this.medicationChart && this.medicationChart.destroy();
   },
 };
