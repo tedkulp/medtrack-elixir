@@ -20,7 +20,7 @@ RUN mix local.rebar --force
 RUN mix deps.get
 
 # Compile the project.
-RUN mix do compile --force
+RUN MIX_ENV=prod mix do compile --force
 
 # Install Node.js dependencies
 RUN npm install --prefix ./assets
