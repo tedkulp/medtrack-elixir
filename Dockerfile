@@ -17,13 +17,11 @@ RUN mix local.hex --force
 RUN mix local.rebar --force
 
 # Grab packages from hex.pm.
-RUN mix deps.get
+RUN mix deps.get --only prod
 
 # Compile the project.
-RUN MIX_ENV=prod mix do compile --force
-
-# Install Node.js dependencies
-RUN npm install --prefix ./assets
+RUN MIX_ENV=prod mix compile
+RUN MIX_ENV=prod mix assets.deploy
 
 RUN chmod 755 /app/entrypoint.sh
 CMD ["/app/entrypoint.sh"]
