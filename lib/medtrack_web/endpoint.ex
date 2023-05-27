@@ -8,7 +8,8 @@ defmodule MedtrackWeb.Endpoint do
     store: :cookie,
     key: "_medtrack_key",
     signing_salt: "Auju64Lw",
-    same_site: "Lax"
+    same_site: "None",
+    secure: true
   ]
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
