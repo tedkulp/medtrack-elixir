@@ -54,7 +54,12 @@ defmodule MedtrackWeb.RefillLive.FormComponent do
   end
 
   defp save_refill(socket, :edit, refill_params) do
-    case Tracker.update_refill(socket.assigns.refill, refill_params, socket.assigns.medication_id) do
+    case Tracker.update_refill(
+           socket.assigns.refill,
+           refill_params,
+           socket.assigns.medication_id,
+           socket.assigns.timezone
+         ) do
       {:ok, refill} ->
         notify_parent({:saved, refill})
 

@@ -12,7 +12,7 @@
 </.header>
 
 <.list>
-  <:item title="Taken at"><%= @dose.taken_at %></:item>
+  <:item title="Taken at"><%= format_time(@dose.taken_at, timezone: @timezone) %></:item>
   <:item title="Quantity"><%= @dose.quantity %></:item>
 </.list>
 

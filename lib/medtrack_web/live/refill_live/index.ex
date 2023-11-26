@@ -1,4 +1,6 @@
 defmodule MedtrackWeb.RefillLive.Index do
+  require Logger
+
   use MedtrackWeb, :live_view
 
   import Medtrack.DateTimeUtil, only: [format_time: 2]
@@ -13,13 +15,24 @@ defmodule MedtrackWeb.RefillLive.Index do
   @impl true
   def mount(params, _session, socket) do
     socket = assign_locale(socket)
-    {:ok, stream(socket, :refills, Tracker.list_refills(params["medication_id"]))}
+
+    {:ok,
+     stream(
+       socket,
+       :refills,
+       Tracker.list_refills(params["medication_id"], %{sort_by: :filled_at, sort_order: :desc})
+     )}
   end
 
   defp assign_locale(socket) do
     locale = get_connect_params(socket)["locale"] || @default_locale
     timezone = get_connect_params(socket)["timezone"] || @default_timezone
     timezone_offset = get_connect_params(socket)["timezone_offset"] || @default_timezone_offset
+
+    Logger.info(
+      "assign_locale: #{inspect(locale)} #{inspect(timezone)} #{inspect(timezone_offset)}"
+    )
+
     assign(socket, locale: locale, timezone: timezone, timezone_offset: timezone_offset)
   end
 
@@ -32,14 +45,18 @@ defmodule MedtrackWeb.RefillLive.Index do
     socket
     |> assign(:page_title, "Edit Refill")
     |> assign(:medication_id, medication_id)
-    |> assign(:refill, Tracker.get_refill!(id))
+    |> assign(:refill, Tracker.get_refill_with_date_offset!(id, socket.assigns.timezone))
   end
 
   defp apply_action(socket, :new, params) do
+    {:ok, now} = DateTime.now(socket.assigns.timezone, Timex.Timezone.Database)
+
     socket
     |> assign(:page_title, "New Refill")
     |> assign(:medication_id, params["medication_id"])
-    |> assign(:refill, %Refill{})
+    |> assign(:refill, %Refill{
+      filled_at: now
+    })
   end
 
   defp apply_action(socket, :index, params) do

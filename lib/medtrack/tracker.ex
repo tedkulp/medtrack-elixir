@@ -2,6 +2,7 @@ defmodule Medtrack.Tracker do
   @moduledoc """
   The Tracker context.
   """
+  require Logger
 
   import Ecto.Query, warn: false
   alias Medtrack.Repo
@@ -228,6 +229,15 @@ defmodule Medtrack.Tracker do
   """
   def get_dose!(id), do: Repo.get!(Dose, id)
 
+  def get_dose_with_date_offset!(id, timezone) do
+    dose = get_dose!(id)
+
+    {:ok, dt} = DateTime.from_naive(dose.taken_at, "Etc/UTC")
+    {:ok, dt} = DateTime.shift_zone(dt, timezone, Timex.Timezone.Database)
+
+    %Dose{dose | taken_at: DateTime.to_naive(dt)}
+  end
+
   def get_last_dose(medication_id) do
     get_last_dose_query(medication_id)
     |> Repo.one()
@@ -289,6 +299,16 @@ defmodule Medtrack.Tracker do
       |> Dose.changeset(attrs)
       |> Repo.update()
     end
+  end
+
+  def update_dose(%Dose{} = dose, attrs, medication_id, timezone) do
+    {:ok, ndt} = NaiveDateTime.from_iso8601("#{attrs["taken_at"]}:00")
+    {:ok, dt} = DateTime.from_naive(ndt, timezone, Timex.Timezone.Database)
+    {:ok, dt} = DateTime.shift_zone(dt, "Etc/UTC")
+
+    attrs = Map.put(attrs, "taken_at", DateTime.to_naive(dt))
+
+    update_dose(dose, attrs, medication_id)
   end
 
   @doc """
@@ -368,6 +388,15 @@ defmodule Medtrack.Tracker do
   """
   def get_refill!(id), do: Repo.get!(Refill, id)
 
+  def get_refill_with_date_offset!(id, timezone) do
+    refill = get_refill!(id)
+
+    {:ok, dt} = DateTime.from_naive(refill.filled_at, "Etc/UTC")
+    {:ok, dt} = DateTime.shift_zone(dt, timezone, Timex.Timezone.Database)
+
+    %Refill{refill | filled_at: DateTime.to_naive(dt)}
+  end
+
   def get_last_refill(medication_id) do
     get_last_refill_query(medication_id)
     |> Repo.one()
@@ -428,6 +457,16 @@ defmodule Medtrack.Tracker do
       |> Refill.changeset(attrs)
       |> Repo.update()
     end
+  end
+
+  def update_refill(%Refill{} = refill, attrs, medication_id, timezone) do
+    {:ok, ndt} = NaiveDateTime.from_iso8601("#{attrs["filled_at"]}:00")
+    {:ok, dt} = DateTime.from_naive(ndt, timezone, Timex.Timezone.Database)
+    {:ok, dt} = DateTime.shift_zone(dt, "Etc/UTC")
+
+    attrs = Map.put(attrs, "filled_at", DateTime.to_naive(dt))
+
+    update_refill(refill, attrs, medication_id)
   end
 
   @doc """

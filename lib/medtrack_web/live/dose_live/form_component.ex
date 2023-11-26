@@ -55,7 +55,12 @@ defmodule MedtrackWeb.DoseLive.FormComponent do
   end
 
   defp save_dose(socket, :edit, dose_params) do
-    case Tracker.update_dose(socket.assigns.dose, dose_params, socket.assigns.medication_id) do
+    case Tracker.update_dose(
+           socket.assigns.dose,
+           dose_params,
+           socket.assigns.medication_id,
+           socket.assigns.timezone
+         ) do
       {:ok, dose} ->
         notify_parent({:saved, dose})
 

@@ -47,6 +47,9 @@
     title={@page_title}
     action={@live_action}
     refill={@refill}
+    locale={@locale}
+    timezone={@timezone}
+    timezone_offset={@timezone_offset}
     patch={~p"/medications/#{@medication_id}/refills"}
   />
 </.modal>

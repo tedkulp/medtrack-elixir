@@ -12,7 +12,7 @@
 </.header>
 
 <.list>
-  <:item title="Filled at"><%= @refill.filled_at %></:item>
+  <:item title="Filled at"><%= format_time(@refill.filled_at, timezone: @timezone) %></:item>
   <:item title="Quantity"><%= @refill.quantity %></:item>
 </.list>
 

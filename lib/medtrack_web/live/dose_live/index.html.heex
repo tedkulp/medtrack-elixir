@@ -45,6 +45,9 @@
     title={@page_title}
     action={@live_action}
     dose={@dose}
+    locale={@locale}
+    timezone={@timezone}
+    timezone_offset={@timezone_offset}
     patch={~p"/medications/#{@medication_id}/doses"}
   />
 </.modal>

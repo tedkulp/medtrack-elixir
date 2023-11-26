@@ -1,4 +1,6 @@
 defmodule MedtrackWeb.DoseLive.Index do
+  require Logger
+
   use MedtrackWeb, :live_view
 
   import Medtrack.DateTimeUtil, only: [format_time: 2]
@@ -12,13 +14,23 @@ defmodule MedtrackWeb.DoseLive.Index do
 
   @impl true
   def mount(params, _session, socket) do
-    {:ok, stream(assign_locale(socket), :doses, Tracker.list_doses(params["medication_id"]))}
+    {:ok,
+     stream(
+       assign_locale(socket),
+       :doses,
+       Tracker.list_doses(params["medication_id"], %{sort_by: :taken_at, sort_order: :desc})
+     )}
   end
 
   defp assign_locale(socket) do
     locale = get_connect_params(socket)["locale"] || @default_locale
     timezone = get_connect_params(socket)["timezone"] || @default_timezone
     timezone_offset = get_connect_params(socket)["timezone_offset"] || @default_timezone_offset
+
+    Logger.info(
+      "assign_locale: #{inspect(locale)} #{inspect(timezone)} #{inspect(timezone_offset)}"
+    )
+
     assign(socket, locale: locale, timezone: timezone, timezone_offset: timezone_offset)
   end
 
@@ -31,14 +43,19 @@ defmodule MedtrackWeb.DoseLive.Index do
     socket
     |> assign(:page_title, "Edit Dose")
     |> assign(:medication_id, medication_id)
-    |> assign(:dose, Tracker.get_dose!(id))
+    |> assign(:dose, Tracker.get_dose_with_date_offset!(id, socket.assigns.timezone))
   end
 
   defp apply_action(socket, :new, params) do
+    {:ok, now} = DateTime.now(socket.assigns.timezone, Timex.Timezone.Database)
+
     socket
     |> assign(:page_title, "New Dose")
     |> assign(:medication_id, params["medication_id"])
-    |> assign(:dose, %Dose{taken_at: DateTime.utc_now(), quantity: 1})
+    |> assign(:dose, %Dose{
+      taken_at: now,
+      quantity: 1
+    })
   end
 
   defp apply_action(socket, :index, params) do
